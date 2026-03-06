@@ -27,7 +27,16 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                sh 'docker push sohaa288/my-k8s-app:${BUILD_NUMBER}'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub-creds',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASS'
+                )]) {
+                    sh '''
+                    echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
+                    docker push sohaa288/my-k8s-app:${BUILD_NUMBER}
+                    '''
+                }
             }
         }
     }
