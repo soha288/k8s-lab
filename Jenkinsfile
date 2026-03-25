@@ -32,5 +32,18 @@ pipeline {
                 }
             }
         }
+
+        stage('Run Container') {
+            steps {
+                sh '''
+                # Stop old container if exists
+                docker stop my-app || true
+                docker rm my-app || true
+
+                # Run new container
+                docker run -d -p 3000:3000 --name my-app sohaa288/my-k8s-app:${BUILD_NUMBER}
+                '''
+            }
+        }
     }
 }
